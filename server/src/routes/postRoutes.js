@@ -1,12 +1,13 @@
 import express from 'express'
 import authMiddleware from '../middleware/authMiddleware.js'
+import upload from '../middleware/uploadMiddleware.js'
 import commentRoutes from './commentRoutes.js'
 import postLikeRoutes from './postLikeRoutes.js'
 import { create, getAll } from '../controllers/postController.js'
 
 const router = express.Router()
 
-router.post('/', authMiddleware, create)
+router.post('/', authMiddleware, upload.single('image'), create)
 router.get('/', authMiddleware, getAll)
 
 // comments routes for a specific post

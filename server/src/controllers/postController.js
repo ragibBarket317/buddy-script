@@ -6,6 +6,7 @@ const create = async (req, res) => {
       author: req.user.userId,
       caption: req.body.caption,
       visibility: req.body.visibility,
+      file: req.file,
     })
 
     return res.status(201).json({
