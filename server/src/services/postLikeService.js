@@ -25,4 +25,20 @@ const togglePostLike = async ({ postId, userId }) => {
   }
 }
 
-export { togglePostLike }
+const getPostLikers = async (postId) => {
+  const post = await Post.findById(postId)
+
+  if (!post) {
+    throw new Error('Post not found')
+  }
+
+  const likes = await PostLike.find({
+    post: postId,
+  })
+    .populate('user', 'firstName lastName email')
+    .sort({ createdAt: -1 })
+
+  return likes
+}
+
+export { togglePostLike, getPostLikers }

@@ -4,7 +4,7 @@ import { create, getAll } from '../controllers/commentController.js'
 
 const router = express.Router({ mergeParams: true })
 
-router.post('/', authMiddleware, create)
-router.get('/', authMiddleware, getAll)
+router.post('/comments', authMiddleware, create)
+router.get('/comments', authMiddleware, getAll)
 
 export default router

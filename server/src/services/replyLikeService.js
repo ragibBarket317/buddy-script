@@ -28,4 +28,22 @@ const toggleReplyLike = async ({ replyId, userId }) => {
   }
 }
 
-export { toggleReplyLike }
+const getReplyLikers = async (replyId) => {
+  const reply = await Reply.findById(replyId)
+
+  if (!reply) {
+    throw new Error('Reply not found')
+  }
+
+  const likes = await ReplyLike.find({
+    reply: replyId,
+  })
+    .populate('user', 'firstName lastName email')
+    .sort({
+      createdAt: -1,
+    })
+
+  return likes
+}
+
+export { toggleReplyLike, getReplyLikers }

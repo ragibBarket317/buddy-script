@@ -10,9 +10,9 @@ router.post('/', authMiddleware, create)
 router.get('/', authMiddleware, getAll)
 
 // comments routes for a specific post
-router.use('/:postId/comments', commentRoutes)
+router.use('/:postId', commentRoutes)
 
 // like routes for a specific post
-router.use('/:postId/like', postLikeRoutes)
+router.use('/:postId', postLikeRoutes)
 
 export default router

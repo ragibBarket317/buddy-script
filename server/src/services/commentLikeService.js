@@ -28,4 +28,20 @@ const toggleCommentLike = async ({ commentId, userId }) => {
   }
 }
 
-export { toggleCommentLike }
+const getCommentLikers = async (commentId) => {
+  const comment = await Comment.findById(commentId)
+
+  if (!comment) {
+    throw new Error('Comment not found')
+  }
+
+  const likes = await CommentLike.find({
+    comment: commentId,
+  })
+    .populate('user', 'firstName lastName email')
+    .sort({ createdAt: -1 })
+
+  return likes
+}
+
+export { toggleCommentLike, getCommentLikers }

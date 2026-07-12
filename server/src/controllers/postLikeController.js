@@ -1,4 +1,4 @@
-import { togglePostLike } from '../services/postLikeService.js'
+import { getPostLikers, togglePostLike } from '../services/postLikeService.js'
 
 const toggle = async (req, res) => {
   try {
@@ -22,4 +22,21 @@ const toggle = async (req, res) => {
   }
 }
 
-export { toggle }
+const getAll = async (req, res) => {
+  try {
+    const data = await getPostLikers(req.params.postId)
+
+    return res.status(200).json({
+      success: true,
+      message: 'Likes fetched successfully',
+      data,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    })
+  }
+}
+
+export { toggle, getAll }
