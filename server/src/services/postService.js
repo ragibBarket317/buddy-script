@@ -1,3 +1,5 @@
+import Comment from '../models/commentModel.js'
+import PostLike from '../models/postLikeModel.js'
 import Post from '../models/postModel.js'
 import { uploadImage } from './uploadService.js'
 
@@ -32,7 +34,22 @@ const getFeed = async (userId) => {
       createdAt: -1,
     })
 
-  return posts
+  const enrichedPosts = await Promise.all(
+    posts.map(async (post) => {
+      const [likesCount, commentsCount] = await Promise.all([
+        PostLike.countDocuments({ post: post._id }),
+        Comment.countDocuments({ post: post._id }),
+      ])
+
+      return {
+        ...post.toJSON(),
+        likesCount,
+        commentsCount,
+      }
+    }),
+  )
+
+  return enrichedPosts
 }
 
 export { createPost, getFeed }
