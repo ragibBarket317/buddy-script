@@ -1,4 +1,37 @@
+'use client'
+import { useRouter } from 'next/navigation'
+import { login } from '@/services/authService'
+import { useState } from 'react'
 export default function LoginForm() {
+  const router = useRouter()
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    try {
+      const response = await login(formData)
+
+      if (response.data.success) {
+        router.push('/feed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <>
       <div className="_social_login_content">
@@ -29,13 +62,16 @@ export default function LoginForm() {
           <span>Or</span>
         </div>
 
-        <form className="_social_login_form">
+        <form onSubmit={handleSubmit} className="_social_login_form">
           <div className="row">
             <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
               <div className="_social_login_form_input _mar_b14">
                 <label className="_social_login_label _mar_b8">Email</label>
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="form-control _social_login_input"
                 />
               </div>
@@ -46,6 +82,9 @@ export default function LoginForm() {
                 <label className="_social_login_label _mar_b8">Password</label>
                 <input
                   type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   className="form-control _social_login_input"
                 />
               </div>
@@ -82,7 +121,7 @@ export default function LoginForm() {
             <div className="col-lg-12 col-md-12 col-xl-12 col-sm-12">
               <div className="_social_login_form_btn _mar_t40 _mar_b60">
                 <button
-                  type="button"
+                  type="submit"
                   className="_social_login_form_btn_link _btn1"
                 >
                   Login now

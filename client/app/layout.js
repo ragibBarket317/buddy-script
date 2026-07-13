@@ -1,3 +1,4 @@
+import Script from 'next/script'
 import { Poppins } from 'next/font/google'
 import './globals.css'
 import './globals.css'
@@ -29,7 +30,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={poppins.className}>
-      <body>{children}</body>
+      <body>
+        {children}
+
+        {/* <Script
+          src="/assets/js/bootstrap.bundle.min.js"
+          strategy="beforeInteractive"
+        /> */}
+
+        {/* <Script src="/assets/js/custom.js" strategy="afterInteractive" /> */}
+      </body>
     </html>
   )
 }

@@ -1,4 +1,5 @@
 import { loginUser, registerUser } from '../services/authService.js'
+import generateToken from '../utils/generateToken.js'
 
 const register = async (req, res) => {
   try {
@@ -19,12 +20,21 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const data = await loginUser(req.body)
+    const { token, user } = await loginUser(req.body)
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
 
     return res.status(200).json({
       success: true,
       message: 'User logged in successfully',
-      data,
+      data: {
+        user,
+      },
     })
   } catch (error) {
     return res.status(400).json({
