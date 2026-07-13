@@ -30,5 +30,5 @@ export function proxy(request) {
 }
 
 export const config = {
-  matcher: ['/feed/:path*', '/login', '/register'],
+  matcher: ['/', '/feed/:path*', '/login', '/register'],
 }
