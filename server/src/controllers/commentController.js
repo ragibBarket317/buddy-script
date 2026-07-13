@@ -23,7 +23,10 @@ const create = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const data = await getComments(req.params.postId)
+    const data = await getComments({
+      postId: req.params.postId,
+      userId: req.user.userId,
+    })
 
     return res.status(200).json({
       success: true,

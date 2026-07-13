@@ -23,7 +23,10 @@ const create = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const data = await getReplies(req.params.commentId)
+    const data = await getReplies({
+      commentId: req.params.commentId,
+      userId: req.user.userId,
+    })
 
     return res.status(200).json({
       success: true,

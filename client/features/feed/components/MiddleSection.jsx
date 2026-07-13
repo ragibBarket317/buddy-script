@@ -1,8 +1,33 @@
-import PostsSection from './Timeline/PostsSection'
+'use client'
+import { useEffect, useState } from 'react'
+import { getPosts } from '@/services/postService'
+
+import PostCard from './Timeline/PostCard'
 import PostSubmitSection from './Timeline/PostSubmitSection'
 import StorySection from './Timeline/StorySection'
 
 export default function MiddleSection() {
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await getPosts()
+        setPosts(response.data.data)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPosts()
+  }, [])
+
+  if (loading) {
+    return <div>Loading posts...</div>
+  }
+
   return (
     <>
       <div className="col-xl-6 col-lg-6 col-md-12 col-sm-12">
@@ -11,7 +36,9 @@ export default function MiddleSection() {
             <StorySection />
             {/*For Mobile End*/}
             <PostSubmitSection />
-            <PostsSection />
+            {posts.map((post) => (
+              <PostCard key={post._id} post={post} />
+            ))}
           </div>
         </div>
       </div>

@@ -36,15 +36,17 @@ const getFeed = async (userId) => {
 
   const enrichedPosts = await Promise.all(
     posts.map(async (post) => {
-      const [likesCount, commentsCount] = await Promise.all([
+      const [likesCount, commentsCount, likedByUser] = await Promise.all([
         PostLike.countDocuments({ post: post._id }),
         Comment.countDocuments({ post: post._id }),
+        userId ? PostLike.findOne({ post: post._id, user: userId }) : null,
       ])
 
       return {
         ...post.toJSON(),
         likesCount,
         commentsCount,
+        isLiked: !!likedByUser,
       }
     }),
   )
