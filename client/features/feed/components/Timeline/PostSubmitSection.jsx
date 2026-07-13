@@ -1,44 +1,284 @@
+'use client'
+import { useState, useRef } from 'react'
+import { createPost } from '@/services/postService'
+
 export default function PostSubmitSection() {
+  const [caption, setCaption] = useState('')
+  const [visibility, setVisibility] = useState('public')
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+  const [showVisibilityMenu, setShowVisibilityMenu] = useState(false)
+
+  const fileInputRef = useRef(null)
+
+  const visibilityOptions = [
+    { value: 'public', label: 'Public', icon: '🌐' },
+    { value: 'private', label: 'Only me', icon: '🔒' },
+  ]
+
+  const currentVisibility = visibilityOptions.find(
+    (v) => v.value === visibility,
+  )
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageFile(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setImageFile(null)
+    setImagePreview(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const handlePostSubmit = async () => {
+    if (!caption.trim() || submitting) return
+
+    setSubmitting(true)
+    try {
+      const formData = new FormData()
+      formData.append('caption', caption)
+      formData.append('visibility', visibility)
+      if (imageFile) {
+        formData.append('image', imageFile)
+      }
+
+      const res = await createPost(formData)
+
+      setCaption('')
+      handleRemoveImage()
+      setVisibility('public')
+
+      if (onPostCreated) {
+        onPostCreated(res.data.data)
+      }
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const showFloatingLabel = !isFocused && caption.length === 0
   return (
     <>
       <div className="_feed_inner_text_area  _b_radious6 _padd_b24 _padd_t24 _padd_r24 _padd_l24 _mar_b16">
-        <div className="_feed_inner_text_area_box">
-          <div className="_feed_inner_text_area_box_image">
-            <img
-              src="assets/images/txt_img.png"
-              alt="Image"
-              className="_txt_img"
-            />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <div
+            className="_feed_inner_text_area_box"
+            style={{ flex: 1, minWidth: 0 }}
+          >
+            <div className="_feed_inner_text_area_box_image">
+              <img
+                src="assets/images/txt_img.png"
+                alt="Image"
+                className="_txt_img"
+              />
+            </div>
+            <div
+              className="form-floating _feed_inner_text_area_box_form "
+              style={{ position: 'relative' }}
+            >
+              <textarea
+                className="form-control _textarea"
+                placeholder="Leave a comment here"
+                id="floatingTextarea"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                style={{
+                  position: 'relative',
+                  zIndex: 1,
+                  background: 'transparent',
+                }}
+              ></textarea>
+
+              {showFloatingLabel && (
+                <label
+                  className="_feed_textarea_label"
+                  htmlFor="floatingTextarea"
+                  style={{ pointerEvents: 'none' }}
+                >
+                  Write something ...
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="23"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 23 24"
+                  >
+                    <path
+                      fill="#666"
+                      d="M19.504 19.209c.332 0 .601.289.601.646 0 .326-.226.596-.52.64l-.081.005h-6.276c-.332 0-.602-.289-.602-.645 0-.327.227-.597.52-.64l.082-.006h6.276zM13.4 4.417c1.139-1.223 2.986-1.223 4.125 0l1.182 1.268c1.14 1.223 1.14 3.205 0 4.427L9.82 19.649a2.619 2.619 0 01-1.916.85h-3.64c-.337 0-.61-.298-.6-.66l.09-3.941a3.019 3.019 0 01.794-1.982l8.852-9.5zm-.688 2.562l-7.313 7.85a1.68 1.68 0 00-.441 1.101l-.077 3.278h3.023c.356 0 .698-.133.968-.376l.098-.096 7.35-7.887-3.608-3.87zm3.962-1.65a1.633 1.633 0 00-2.423 0l-.688.737 3.606 3.87.688-.737c.631-.678.666-1.755.105-2.477l-.105-.124-1.183-1.268z"
+                    />
+                  </svg>
+                </label>
+              )}
+            </div>
           </div>
-          <div className="form-floating _feed_inner_text_area_box_form ">
-            <textarea
-              className="form-control _textarea"
-              placeholder="Leave a comment here"
-              id="floatingTextarea"
-            ></textarea>
-            <label className="_feed_textarea_label" htmlFor="floatingTextarea">
-              Write something ...
+
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <button
+              type="button"
+              onClick={() => setShowVisibilityMenu((prev) => !prev)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '13px',
+                fontWeight: 500,
+                color: '#377DFF',
+                background: '#EDF4FF',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 10px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {currentVisibility.icon} {currentVisibility.label}
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="23"
-                height="24"
+                width="10"
+                height="6"
+                viewBox="0 0 10 6"
                 fill="none"
-                viewBox="0 0 23 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fill="#666"
-                  d="M19.504 19.209c.332 0 .601.289.601.646 0 .326-.226.596-.52.64l-.081.005h-6.276c-.332 0-.602-.289-.602-.645 0-.327.227-.597.52-.64l.082-.006h6.276zM13.4 4.417c1.139-1.223 2.986-1.223 4.125 0l1.182 1.268c1.14 1.223 1.14 3.205 0 4.427L9.82 19.649a2.619 2.619 0 01-1.916.85h-3.64c-.337 0-.61-.298-.6-.66l.09-3.941a3.019 3.019 0 01.794-1.982l8.852-9.5zm-.688 2.562l-7.313 7.85a1.68 1.68 0 00-.441 1.101l-.077 3.278h3.023c.356 0 .698-.133.968-.376l.098-.096 7.35-7.887-3.608-3.87zm3.962-1.65a1.633 1.633 0 00-2.423 0l-.688.737 3.606 3.87.688-.737c.631-.678.666-1.755.105-2.477l-.105-.124-1.183-1.268z"
+                  d="M1 1L5 5L9 1"
+                  stroke="#377DFF"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
-            </label>
+            </button>
+
+            {showVisibilityMenu && (
+              <ul
+                style={{
+                  position: 'absolute',
+                  top: '110%',
+                  right: 0,
+                  background: '#fff',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+                  borderRadius: '8px',
+                  listStyle: 'none',
+                  padding: '6px 0',
+                  margin: 0,
+                  minWidth: '140px',
+                  zIndex: 10,
+                }}
+              >
+                {visibilityOptions.map((opt) => (
+                  <li key={opt.value}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVisibility(opt.value)
+                        setShowVisibilityMenu(false)
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        background:
+                          visibility === opt.value ? '#F3F6F9' : 'transparent',
+                        border: 'none',
+                        padding: '8px 14px',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        color: '#333',
+                      }}
+                    >
+                      {opt.icon} {opt.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
+
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
+
+        {imagePreview && (
+          <div
+            style={{
+              position: 'relative',
+              marginTop: '16px',
+              marginBottom: '4px',
+              width: '100%',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              background: '#f4f5f7',
+            }}
+          >
+            <img
+              src={imagePreview}
+              alt="Selected preview"
+              style={{
+                width: '100%',
+                maxHeight: '360px',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                border: 'none',
+                background: 'rgba(0,0,0,0.55)',
+                color: '#fff',
+                fontSize: '15px',
+                lineHeight: '28px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+              aria-label="Remove image"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/*For Desktop*/}
         <div className="_feed_inner_text_area_bottom">
           <div className="_feed_inner_text_area_item">
             <div className="_feed_inner_text_area_bottom_photo _feed_common">
               <button
                 type="button"
+                onClick={handlePhotoClick}
                 className="_feed_inner_text_area_bottom_photo_link"
               >
                 {' '}
@@ -134,7 +374,12 @@ export default function PostSubmitSection() {
             </div>
           </div>
           <div className="_feed_inner_text_area_btn">
-            <button type="button" className="_feed_inner_text_area_btn_link">
+            <button
+              type="button"
+              onClick={handlePostSubmit}
+              disabled={submitting}
+              className="_feed_inner_text_area_btn_link"
+            >
               <svg
                 className="_mar_img"
                 xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +395,7 @@ export default function PostSubmitSection() {
                   clipRule="evenodd"
                 />
               </svg>{' '}
-              <span>Post</span>
+              <span>{submitting ? 'Posting...' : 'Post'}</span>
             </button>
           </div>
         </div>
@@ -162,6 +407,7 @@ export default function PostSubmitSection() {
               <div className="_feed_inner_text_area_bottom_photo _feed_common">
                 <button
                   type="button"
+                  onClick={handlePhotoClick}
                   className="_feed_inner_text_area_bottom_photo_link"
                 >
                   {' '}
@@ -247,7 +493,12 @@ export default function PostSubmitSection() {
               </div>
             </div>
             <div className="_feed_inner_text_area_btn">
-              <button type="button" className="_feed_inner_text_area_btn_link">
+              <button
+                type="button"
+                onClick={handlePostSubmit}
+                disabled={submitting}
+                className="_feed_inner_text_area_btn_link"
+              >
                 <svg
                   className="_mar_img"
                   xmlns="http://www.w3.org/2000/svg"
@@ -263,7 +514,7 @@ export default function PostSubmitSection() {
                     clipRule="evenodd"
                   />
                 </svg>{' '}
-                <span>Post</span>
+                <span>{submitting ? 'Posting...' : 'Post'}</span>
               </button>
             </div>
           </div>
