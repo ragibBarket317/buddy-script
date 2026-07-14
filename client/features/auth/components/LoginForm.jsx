@@ -37,9 +37,11 @@ export default function LoginForm() {
     setSubmitting(true)
     try {
       const response = await login(formData)
-
+      console.log('Response:', response.data)
       if (response.data.success) {
+        console.log('Before push')
         router.push('/feed')
+        console.log('After push')
       }
     } catch (error) {
       setServerError(
