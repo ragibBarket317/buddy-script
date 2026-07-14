@@ -7,6 +7,12 @@ import {
 } from '@/services/likeService'
 import { getComments, createComment } from '@/services/commentService'
 import { getReplies, createReply } from '@/services/replyService'
+import {
+  getPostLikers,
+  getCommentLikers,
+  getReplyLikers,
+} from '@/services/likeService'
+import LikersModal from '@/components/common/LikersModal'
 
 export default function PostCard({ post }) {
   const [liked, setLiked] = useState(post.isLiked || false)
@@ -20,9 +26,13 @@ export default function PostCard({ post }) {
   const [submitting, setSubmitting] = useState(false)
   const [visibleCount, setVisibleCount] = useState(1)
 
-  const [replyTexts, setReplyTexts] = useState({}) // { [commentId]: text }
+  const [replyTexts, setReplyTexts] = useState({})
   const [submittingReply, setSubmittingReply] = useState({})
   const [openReplyBox, setOpenReplyBox] = useState({})
+
+  const [likersModal, setLikersModal] = useState(null)
+  const [likers, setLikers] = useState([])
+  const [loadingLikers, setLoadingLikers] = useState(false)
 
   // ---------- LIKE POST ----------
   const handleLikeToggle = async () => {
@@ -168,6 +178,31 @@ export default function PostCard({ post }) {
   const toggleReplyBox = (commentId) => {
     setOpenReplyBox((prev) => ({ ...prev, [commentId]: !prev[commentId] }))
   }
+
+  // Likers Modal
+
+  const openLikersModal = async (type, id) => {
+    setLikersModal({ type, id })
+    setLoadingLikers(true)
+    try {
+      let res
+      if (type === 'post') res = await getPostLikers(id)
+      if (type === 'comment') res = await getCommentLikers(id)
+      if (type === 'reply') res = await getReplyLikers(id)
+      setLikers(res.data.data)
+    } catch (error) {
+      console.error(error)
+      setLikers([])
+    } finally {
+      setLoadingLikers(false)
+    }
+  }
+
+  const closeLikersModal = () => {
+    setLikersModal(null)
+    setLikers([])
+  }
+
   return (
     <>
       <div className="_feed_inner_timeline_post_area _b_radious6 _padd_b24 _padd_t24 _mar_b16">
@@ -370,7 +405,11 @@ export default function PostCard({ post }) {
               alt="Image"
               className="_react_img _rect_img_mbl_none"
             />
-            <p className="_feed_inner_timeline_total_reacts_para">
+            <p
+              className="_feed_inner_timeline_total_reacts_para"
+              onClick={() => openLikersModal('post', post._id)}
+              style={{ cursor: 'pointer' }}
+            >
               {likesCount}+
             </p>
           </div>
@@ -628,7 +667,13 @@ export default function PostCard({ post }) {
                               </svg>
                             </span>
                           </div>
-                          <span className="_total">
+                          <span
+                            className="_total"
+                            onClick={() =>
+                              openLikersModal('comment', comment._id)
+                            }
+                            style={{ cursor: 'pointer' }}
+                          >
                             {comment.likesCount || 0}
                           </span>
                         </div>
@@ -735,7 +780,13 @@ export default function PostCard({ post }) {
                                     </svg>
                                   </span>
                                 </div>
-                                <span className="_total">
+                                <span
+                                  className="_total"
+                                  onClick={() =>
+                                    openLikersModal('reply', reply._id)
+                                  }
+                                  style={{ cursor: 'pointer' }}
+                                >
                                   {reply.likesCount || 0}
                                 </span>
                               </div>
@@ -848,6 +899,13 @@ export default function PostCard({ post }) {
           </>
         )}
       </div>
+      {likersModal && (
+        <LikersModal
+          likers={likers}
+          loading={loadingLikers}
+          onClose={closeLikersModal}
+        />
+      )}
     </>
   )
 }

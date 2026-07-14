@@ -1,8 +1,17 @@
-export default function ThemeSwitcher() {
+'use client'
+
+export default function ThemeSwitcher({ darkMode, setDarkMode }) {
+  const handleToggle = () => {
+    setDarkMode((prev) => !prev)
+  }
   return (
     <>
       <div className="_layout_mode_swithing_btn">
-        <button type="button" className="_layout_swithing_btn_link">
+        <button
+          onClick={handleToggle}
+          type="button"
+          className="_layout_swithing_btn_link"
+        >
           <div className="_layout_swithing_btn">
             <div className="_layout_swithing_btn_round"></div>
           </div>

@@ -33,10 +33,10 @@ export default function RootLayout({ children }) {
       <body>
         {children}
 
-        {/* <Script
+        <Script
           src="/assets/js/bootstrap.bundle.min.js"
           strategy="beforeInteractive"
-        /> */}
+        />
 
         {/* <Script src="/assets/js/custom.js" strategy="afterInteractive" /> */}
       </body>
