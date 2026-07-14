@@ -37,12 +37,8 @@ export default function LoginForm() {
     setSubmitting(true)
     try {
       const response = await login(formData)
-      console.log('Response:', response.data)
       if (response.data.success) {
-        console.log('Before push')
-        // router.push('/feed')
-        window.location.href = '/feed'
-        console.log('After push')
+        router.push('/feed')
       }
     } catch (error) {
       setServerError(
@@ -184,7 +180,7 @@ export default function LoginForm() {
                   disabled={submitting}
                   className="_social_login_form_btn_link _btn1"
                 >
-                  {submitting ? 'Login...' : 'Login now'}
+                  {submitting ? 'Login now...' : 'Login now'}
                 </button>
               </div>
             </div>
