@@ -40,7 +40,8 @@ export default function LoginForm() {
       console.log('Response:', response.data)
       if (response.data.success) {
         console.log('Before push')
-        router.push('/feed')
+        // router.push('/feed')
+        window.location.href = '/feed'
         console.log('After push')
       }
     } catch (error) {
