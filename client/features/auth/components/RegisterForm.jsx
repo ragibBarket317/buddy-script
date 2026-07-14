@@ -2,9 +2,14 @@
 import { useRouter } from 'next/navigation'
 import { register } from '@/services/authService'
 import { useState } from 'react'
+import Link from 'next/link'
+import { validateRegisterForm } from '@/utils/validation'
 
 export default function RegisterForm() {
   const router = useRouter()
+  const [errors, setErrors] = useState({})
+  const [serverError, setServerError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -23,7 +28,15 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setServerError('')
 
+    const validationErrors = validateRegisterForm(formData)
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      return
+    }
+
+    setSubmitting(true)
     try {
       const response = await register(formData)
 
@@ -31,7 +44,12 @@ export default function RegisterForm() {
         router.push('/login')
       }
     } catch (error) {
-      console.error(error)
+      setServerError(
+        error.response?.data?.message ||
+          'Registration failed. Please try again.',
+      )
+    } finally {
+      setSubmitting(false)
     }
   }
   return (
@@ -65,6 +83,20 @@ export default function RegisterForm() {
           {' '}
           <span>Or</span>
         </div>
+        {serverError && (
+          <div
+            style={{
+              background: '#fdecea',
+              color: '#dc3545',
+              padding: '10px 14px',
+              borderRadius: '6px',
+              fontSize: '14px',
+              marginBottom: '16px',
+            }}
+          >
+            {serverError}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="_social_registration_form">
           <div className="row">
             <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
@@ -77,8 +109,20 @@ export default function RegisterForm() {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className="form-control _social_registration_input"
+                  className={`form-control _social_registration_input ${errors.firstName ? 'is-invalid' : ''}`}
                 />
+                {errors.firstName && (
+                  <span
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '13px',
+                      marginTop: '4px',
+                      display: 'block',
+                    }}
+                  >
+                    {errors.firstName}
+                  </span>
+                )}
               </div>
             </div>
             <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
@@ -91,8 +135,20 @@ export default function RegisterForm() {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className="form-control _social_registration_input"
+                  className={`form-control _social_registration_input ${errors.lastName ? 'is-invalid' : ''}`}
                 />
+                {errors.lastName && (
+                  <span
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '13px',
+                      marginTop: '4px',
+                      display: 'block',
+                    }}
+                  >
+                    {errors.lastName}
+                  </span>
+                )}
               </div>
             </div>
             <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
@@ -105,8 +161,20 @@ export default function RegisterForm() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="form-control _social_registration_input"
+                  className={`form-control _social_registration_input ${errors.email ? 'is-invalid' : ''}`}
                 />
+                {errors.email && (
+                  <span
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '13px',
+                      marginTop: '4px',
+                      display: 'block',
+                    }}
+                  >
+                    {errors.email}
+                  </span>
+                )}
               </div>
             </div>
             <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
@@ -119,8 +187,20 @@ export default function RegisterForm() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="form-control _social_registration_input"
+                  className={`form-control _social_registration_input ${errors.password ? 'is-invalid' : ''}`}
                 />
+                {errors.password && (
+                  <span
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '13px',
+                      marginTop: '4px',
+                      display: 'block',
+                    }}
+                  >
+                    {errors.password}
+                  </span>
+                )}
               </div>
             </div>
             {/* <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
@@ -148,7 +228,7 @@ export default function RegisterForm() {
                 />
                 <label
                   className="form-check-label _social_registration_form_check_label"
-                  for="flexRadioDefault2"
+                  htmlFor="flexRadioDefault2"
                 >
                   I agree to terms & conditions
                 </label>
@@ -160,9 +240,10 @@ export default function RegisterForm() {
               <div className="_social_registration_form_btn _mar_t40 _mar_b60">
                 <button
                   type="submit"
+                  disabled={submitting}
                   className="_social_registration_form_btn_link _btn1"
                 >
-                  Login now
+                  {submitting ? 'Registering...' : 'Register now'}
                 </button>
               </div>
             </div>
@@ -172,7 +253,7 @@ export default function RegisterForm() {
           <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
             <div className="_social_registration_bottom_txt">
               <p className="_social_registration_bottom_txt_para">
-                Dont have an account? <a href="#0">Create New Account</a>
+                Already have an account? <Link href="/login">Login</Link>
               </p>
             </div>
           </div>

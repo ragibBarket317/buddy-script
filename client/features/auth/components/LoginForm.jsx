@@ -1,8 +1,14 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { login } from '@/services/authService'
 import { useState } from 'react'
+import { validateLoginForm } from '@/utils/validation'
+
 export default function LoginForm() {
+  const [errors, setErrors] = useState({})
+  const [serverError, setServerError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
@@ -20,7 +26,15 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setServerError('')
 
+    const validationErrors = validateLoginForm(formData)
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      return
+    }
+
+    setSubmitting(true)
     try {
       const response = await login(formData)
 
@@ -28,7 +42,11 @@ export default function LoginForm() {
         router.push('/feed')
       }
     } catch (error) {
-      console.error(error)
+      setServerError(
+        error.response?.data?.message || 'Login failed. Please try again.',
+      )
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -61,6 +79,20 @@ export default function LoginForm() {
         <div className="_social_login_content_bottom_txt _mar_b40">
           <span>Or</span>
         </div>
+        {serverError && (
+          <div
+            style={{
+              background: '#fdecea',
+              color: '#dc3545',
+              padding: '10px 14px',
+              borderRadius: '6px',
+              fontSize: '14px',
+              marginBottom: '16px',
+            }}
+          >
+            {serverError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="_social_login_form">
           <div className="row">
@@ -72,8 +104,20 @@ export default function LoginForm() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="form-control _social_login_input"
+                  className={`form-control _social_login_input ${errors.email ? 'is-invalid' : ''}`}
                 />
+                {errors.email && (
+                  <span
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '13px',
+                      marginTop: '4px',
+                      display: 'block',
+                    }}
+                  >
+                    {errors.email}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -85,8 +129,20 @@ export default function LoginForm() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="form-control _social_login_input"
+                  className={`form-control _social_login_input ${errors.password ? 'is-invalid' : ''}`}
                 />
+                {errors.password && (
+                  <span
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '13px',
+                      marginTop: '4px',
+                      display: 'block',
+                    }}
+                  >
+                    {errors.password}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -122,9 +178,10 @@ export default function LoginForm() {
               <div className="_social_login_form_btn _mar_t40 _mar_b60">
                 <button
                   type="submit"
+                  disabled={submitting}
                   className="_social_login_form_btn_link _btn1"
                 >
-                  Login now
+                  {submitting ? 'Logging in...' : 'Login now'}
                 </button>
               </div>
             </div>
@@ -135,7 +192,8 @@ export default function LoginForm() {
           <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
             <div className="_social_login_bottom_txt">
               <p className="_social_login_bottom_txt_para">
-                Dont have an account? <a href="#0">Create New Account</a>
+                Dont have an account?{' '}
+                <Link href="/register">Create New Account</Link>
               </p>
             </div>
           </div>

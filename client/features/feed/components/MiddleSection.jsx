@@ -25,7 +25,9 @@ export default function MiddleSection() {
   }, [])
 
   if (loading) {
-    return <div>Loading posts...</div>
+    return (
+      <p style={{ textAlign: 'center', padding: '40px' }}>Loading feed...</p>
+    )
   }
 
   return (

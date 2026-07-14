@@ -34,6 +34,8 @@ export default function PostCard({ post }) {
   const [likers, setLikers] = useState([])
   const [loadingLikers, setLoadingLikers] = useState(false)
 
+  const [showOptionsDropdown, setShowOptionsDropdown] = useState(false)
+
   // ---------- LIKE POST ----------
   const handleLikeToggle = async () => {
     const prevLiked = liked
@@ -228,9 +230,9 @@ export default function PostCard({ post }) {
             <div className="_feed_inner_timeline_post_box_dropdown">
               <div className="_feed_timeline_post_dropdown">
                 <button
-                  href="#0"
-                  id="_timeline_show_drop_btn"
+                  type="button"
                   className="_feed_timeline_post_dropdown_link"
+                  onClick={() => setShowOptionsDropdown((prev) => !prev)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -248,7 +250,9 @@ export default function PostCard({ post }) {
               {/*Dropdown*/}
               <div
                 id="_timeline_drop"
-                className="_feed_timeline_dropdown _timeline_dropdown"
+                className={`_feed_timeline_dropdown _timeline_dropdown ${
+                  showOptionsDropdown ? 'show' : ''
+                }`}
               >
                 <ul className="_feed_timeline_dropdown_list">
                   <li className="_feed_timeline_dropdown_item">
