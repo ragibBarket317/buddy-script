@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react'
 import { createPost } from '@/services/postService'
 
-export default function PostSubmitSection() {
+export default function PostSubmitSection({ onPostCreated }) {
   const [caption, setCaption] = useState('')
   const [visibility, setVisibility] = useState('public')
   const [imageFile, setImageFile] = useState(null)
@@ -41,7 +41,7 @@ export default function PostSubmitSection() {
   }
 
   const handlePostSubmit = async () => {
-    if (!caption.trim() || submitting) return
+    if ((!caption.trim() && !imageFile) || submitting) return
 
     setSubmitting(true)
     try {
@@ -377,7 +377,7 @@ export default function PostSubmitSection() {
             <button
               type="button"
               onClick={handlePostSubmit}
-              disabled={submitting}
+              disabled={submitting || (!caption.trim() && !imageFile)}
               className="_feed_inner_text_area_btn_link"
             >
               <svg
@@ -496,7 +496,7 @@ export default function PostSubmitSection() {
               <button
                 type="button"
                 onClick={handlePostSubmit}
-                disabled={submitting}
+                disabled={submitting || (!caption.trim() && !imageFile)}
                 className="_feed_inner_text_area_btn_link"
               >
                 <svg

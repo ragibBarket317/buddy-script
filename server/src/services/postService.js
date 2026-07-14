@@ -7,9 +7,9 @@ const createPost = async ({ author, caption, visibility, file }) => {
   const normalizedCaption = caption.trim() || ''
   let image = ''
 
-  if (!normalizedCaption) {
-    throw new Error('Caption is required')
-  }
+  // if (!normalizedCaption) {
+  //   throw new Error('Caption is required')
+  // }
 
   if (file) {
     image = await uploadImage(file)
@@ -22,7 +22,12 @@ const createPost = async ({ author, caption, visibility, file }) => {
     visibility: visibility || 'public',
   })
 
-  return post
+  const populatedPost = await Post.findById(post._id).populate(
+    'author',
+    'firstName lastName email',
+  )
+
+  return populatedPost
 }
 
 const getFeed = async (userId) => {

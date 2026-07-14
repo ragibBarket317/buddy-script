@@ -1,8 +1,10 @@
 'use client'
 import { useState } from 'react'
 import LogoutButton from '../layout/LogoutButton'
+import { useAuth } from '@/context/AuthContext'
 
 export default function ProfileDropdown() {
+  const { user } = useAuth()
   const [isDropShow, setIsDropShow] = useState(false)
 
   return (
@@ -15,7 +17,9 @@ export default function ProfileDropdown() {
         />
       </div>
       <div className="_header_nav_dropdown">
-        <p className="_header_nav_para">Dylan Field</p>
+        <p className="_header_nav_para">
+          {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
+        </p>
         <button
           id="_profile_drop_show_btn"
           className="_header_nav_dropdown_btn _dropdown_toggle"
@@ -52,7 +56,9 @@ export default function ProfileDropdown() {
             />
           </div>
           <div className="_nav_profile_dropdown_info_txt">
-            <h4 className="_nav_dropdown_title">Dylan Field</h4>
+            <h4 className="_nav_dropdown_title">
+              {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
+            </h4>
             <a href="profile.html" className="_nav_drop_profile">
               View Profile
             </a>

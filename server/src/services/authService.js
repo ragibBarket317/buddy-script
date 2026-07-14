@@ -73,4 +73,16 @@ const loginUser = async ({ email, password }) => {
   }
 }
 
-export { registerUser, loginUser }
+const getMe = async (userId) => {
+  const user = await User.findById(userId).select(
+    'firstName lastName email createdAt',
+  )
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  return user
+}
+
+export { registerUser, loginUser, getMe }

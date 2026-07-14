@@ -13,6 +13,7 @@ import {
   getReplyLikers,
 } from '@/services/likeService'
 import LikersModal from '@/components/common/LikersModal'
+import { commentFormatTime, postFormatTime } from '@/utils/formatTime'
 
 export default function PostCard({ post }) {
   const [liked, setLiked] = useState(post.isLiked || false)
@@ -223,7 +224,8 @@ export default function PostCard({ post }) {
                   {post.author.firstName} {post.author.lastName}
                 </h4>
                 <p className="_feed_inner_timeline_post_box_para">
-                  5 minute ago .<a href="#0">{post.visibility}</a>
+                  {postFormatTime(post.createdAt)} .
+                  <a href="#0">{post.visibility}</a>
                 </p>
               </div>
             </div>
@@ -438,7 +440,7 @@ export default function PostCard({ post }) {
             <span className="_feed_inner_timeline_reaction_link">
               {' '}
               <span>
-                <svg
+                {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="19"
                   height="19"
@@ -461,6 +463,20 @@ export default function PostCard({ post }) {
                     fill="#664500"
                     d="M6.333 8.972c.729 0 1.32-.827 1.32-1.847s-.591-1.847-1.32-1.847c-.729 0-1.32.827-1.32 1.847s.591 1.847 1.32 1.847zM12.667 8.972c.729 0 1.32-.827 1.32-1.847s-.591-1.847-1.32-1.847c-.729 0-1.32.827-1.32 1.847s.591 1.847 1.32 1.847z"
                   />
+                </svg> */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill={liked ? '#fff' : 'none'}
+                  stroke={liked ? '#377DFF' : 'currentColor'}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="feather feather-thumbs-up"
+                >
+                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
                 </svg>
                 {liked ? 'Liked' : 'Like'}
               </span>
@@ -523,10 +539,7 @@ export default function PostCard({ post }) {
           <>
             <div className="_feed_inner_timeline_cooment_area">
               <div className="_feed_inner_comment_box">
-                <form
-                  onSubmit={handleCommentSubmit}
-                  className="_feed_inner_comment_box_form"
-                >
+                <form className="_feed_inner_comment_box_form">
                   <div className="_feed_inner_comment_box_content">
                     <div className="_feed_inner_comment_box_content_image">
                       <img
@@ -583,7 +596,29 @@ export default function PostCard({ post }) {
                           clipRule="evenodd"
                         />
                       </svg>
-                      {submitting ? 'Posting...' : 'Post'}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      onClick={handleCommentSubmit}
+                      className="_feed_inner_comment_box_icon_btn"
+                    >
+                      <svg
+                        className="_mar_img"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="13"
+                        fill="none"
+                        viewBox="0 0 14 13"
+                      >
+                        <path
+                          fill="#000"
+                          fillOpacity=".46"
+                          fillRule="evenodd"
+                          d="M6.37 7.879l2.438 3.955a.335.335 0 00.34.162c.068-.01.23-.05.289-.247l3.049-10.297a.348.348 0 00-.09-.35.341.341 0 00-.34-.088L1.75 4.03a.34.34 0 00-.247.289.343.343 0 00.16.347L5.666 7.17 9.2 3.597a.5.5 0 01.712.703L6.37 7.88zM9.097 13c-.464 0-.89-.236-1.14-.641L5.372 8.165l-4.237-2.65a1.336 1.336 0 01-.622-1.331c.074-.536.441-.96.957-1.112L11.774.054a1.347 1.347 0 011.67 1.682l-3.05 10.296A1.332 1.332 0 019.098 13z"
+                          clipRule="evenodd"
+                        />
+                      </svg>{' '}
                     </button>
                   </div>
                 </form>
@@ -622,7 +657,8 @@ export default function PostCard({ post }) {
                           <div className="_comment_name">
                             <a href="profile.html ">
                               <h4 className="_comment_name_title">
-                                Radovan SkillArena
+                                {comment.author?.firstName}{' '}
+                                {comment.author?.lastName}
                               </h4>
                             </a>
                           </div>
@@ -654,7 +690,7 @@ export default function PostCard({ post }) {
                                 <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
                               </svg>
                             </span>
-                            <span className="_reaction_heart">
+                            {/* <span className="_reaction_heart">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="16"
@@ -669,7 +705,7 @@ export default function PostCard({ post }) {
                               >
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                               </svg>
-                            </span>
+                            </span> */}
                           </div>
                           <span
                             className="_total"
@@ -704,7 +740,9 @@ export default function PostCard({ post }) {
                                 <span>Share</span>
                               </li>
                               <li>
-                                <span className="_time_link">.21m</span>
+                                <span className="_time_link">
+                                  .{commentFormatTime(comment.createdAt)}
+                                </span>
                               </li>
                             </ul>
                           </div>
@@ -767,7 +805,7 @@ export default function PostCard({ post }) {
                                       <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
                                     </svg>
                                   </span>
-                                  <span className="_reaction_heart">
+                                  {/* <span className="_reaction_heart">
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       width="16"
@@ -782,7 +820,7 @@ export default function PostCard({ post }) {
                                     >
                                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                                     </svg>
-                                  </span>
+                                  </span> */}
                                 </div>
                                 <span
                                   className="_total"
@@ -811,7 +849,9 @@ export default function PostCard({ post }) {
                                       </span>
                                     </li>
                                     <li>
-                                      <span className="_time_link">.21m</span>
+                                      <span className="_time_link">
+                                        .{commentFormatTime(reply.createdAt)}
+                                      </span>
                                     </li>
                                   </ul>
                                 </div>
@@ -823,10 +863,7 @@ export default function PostCard({ post }) {
                       {/* ---------- END REPLIES LIST ---------- */}
                       {openReplyBox[comment._id] && (
                         <div className="_feed_inner_comment_box">
-                          <form
-                            onSubmit={(e) => handleReplySubmit(e, comment._id)}
-                            className="_feed_inner_comment_box_form"
-                          >
+                          <form className="_feed_inner_comment_box_form">
                             <div className="_feed_inner_comment_box_content">
                               <div className="_feed_inner_comment_box_content_image">
                                 <img
@@ -891,6 +928,32 @@ export default function PostCard({ post }) {
                                     clipRule="evenodd"
                                   ></path>
                                 </svg>
+                              </button>
+
+                              <button
+                                type="submit"
+                                disabled={submitting}
+                                onClick={(e) =>
+                                  handleReplySubmit(e, comment._id)
+                                }
+                                className="_feed_inner_comment_box_icon_btn"
+                              >
+                                <svg
+                                  className="_mar_img"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="14"
+                                  height="13"
+                                  fill="none"
+                                  viewBox="0 0 14 13"
+                                >
+                                  <path
+                                    fill="#000"
+                                    fillOpacity=".46"
+                                    fillRule="evenodd"
+                                    d="M6.37 7.879l2.438 3.955a.335.335 0 00.34.162c.068-.01.23-.05.289-.247l3.049-10.297a.348.348 0 00-.09-.35.341.341 0 00-.34-.088L1.75 4.03a.34.34 0 00-.247.289.343.343 0 00.16.347L5.666 7.17 9.2 3.597a.5.5 0 01.712.703L6.37 7.88zM9.097 13c-.464 0-.89-.236-1.14-.641L5.372 8.165l-4.237-2.65a1.336 1.336 0 01-.622-1.331c.074-.536.441-.96.957-1.112L11.774.054a1.347 1.347 0 011.67 1.682l-3.05 10.296A1.332 1.332 0 019.098 13z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>{' '}
                               </button>
                             </div>
                           </form>

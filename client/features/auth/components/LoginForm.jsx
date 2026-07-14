@@ -181,7 +181,7 @@ export default function LoginForm() {
                   disabled={submitting}
                   className="_social_login_form_btn_link _btn1"
                 >
-                  {submitting ? 'Logging in...' : 'Login now'}
+                  {submitting ? 'Login...' : 'Login now'}
                 </button>
               </div>
             </div>

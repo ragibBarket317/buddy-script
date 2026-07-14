@@ -1,4 +1,4 @@
-import { loginUser, registerUser } from '../services/authService.js'
+import { getMe, loginUser, registerUser } from '../services/authService.js'
 import generateToken from '../utils/generateToken.js'
 
 const register = async (req, res) => {
@@ -64,4 +64,16 @@ const logout = async (req, res) => {
   }
 }
 
-export { register, login, logout }
+const me = async (req, res) => {
+  try {
+    const data = await getMe(req.user.userId)
+    return res.status(200).json({
+      success: true,
+      data,
+    })
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message })
+  }
+}
+
+export { register, login, logout, me }

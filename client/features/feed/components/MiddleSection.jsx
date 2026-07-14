@@ -5,8 +5,10 @@ import { getPosts } from '@/services/postService'
 import PostCard from './Timeline/PostCard'
 import PostSubmitSection from './Timeline/PostSubmitSection'
 import StorySection from './Timeline/StorySection'
+import { useAuth } from '@/context/AuthContext'
 
 export default function MiddleSection() {
+  const { user } = useAuth()
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -24,6 +26,14 @@ export default function MiddleSection() {
     fetchPosts()
   }, [])
 
+  const handlePostCreated = (newPost) => {
+    const postWithAuthor = {
+      ...newPost,
+      author: newPost.author?.firstName ? newPost.author : user,
+    }
+    setPosts((prev) => [postWithAuthor, ...prev])
+  }
+
   if (loading) {
     return (
       <p style={{ textAlign: 'center', padding: '40px' }}>Loading feed...</p>
@@ -37,7 +47,7 @@ export default function MiddleSection() {
           <div className="_layout_middle_inner">
             <StorySection />
             {/*For Mobile End*/}
-            <PostSubmitSection />
+            <PostSubmitSection onPostCreated={handlePostCreated} />
             {posts.map((post) => (
               <PostCard key={post._id} post={post} />
             ))}
