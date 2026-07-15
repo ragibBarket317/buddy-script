@@ -1,13 +1,7 @@
 import api from '../lib/axios'
 import { setToken, removeToken } from '@/utils/storage'
 
-export const register = async (data) => {
-  const res = await api.post('/auth/register', data)
-  if (res.data?.data?.token) {
-    setToken(res.data.data.token)
-  }
-  return res
-}
+export const register = async (data) => api.post('/auth/register', data)
 
 export const login = async (data) => {
   const res = await api.post('/auth/login', data)

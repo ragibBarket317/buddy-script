@@ -14,8 +14,10 @@ import {
 } from '@/services/likeService'
 import LikersModal from '@/components/common/LikersModal'
 import { commentFormatTime, postFormatTime } from '@/utils/formatTime'
+import { useAuth } from '@/context/AuthContext'
 
 export default function PostCard({ post }) {
+  const { user } = useAuth()
   const [liked, setLiked] = useState(post.isLiked || false)
   const [likesCount, setLikesCount] = useState(post.likesCount || 0)
 
@@ -92,7 +94,13 @@ export default function PostCard({ post }) {
     setSubmitting(true)
     try {
       const res = await createComment(post._id, { text: commentText })
-      setComments((prev) => [res.data.data, ...prev])
+      const newComment = res.data.data
+
+      const commentWithAuthor = {
+        ...newComment,
+        author: newComment.author?.firstName ? newComment.author : user,
+      }
+      setComments((prev) => [commentWithAuthor, ...prev])
       setCommentsCount((c) => c + 1)
       setCommentText('')
       setShowComments(true)
@@ -134,10 +142,17 @@ export default function PostCard({ post }) {
     setSubmittingReply((prev) => ({ ...prev, [commentId]: true }))
     try {
       const res = await createReply(commentId, { text })
+
+      const newReply = res.data.data
+
+      const replyWithAuthor = {
+        ...newReply,
+        author: newReply.author?.firstName ? newReply.author : user,
+      }
       setComments((prev) =>
         prev.map((c) =>
           c._id === commentId
-            ? { ...c, replies: [...(c.replies || []), res.data.data] }
+            ? { ...c, replies: [...(c.replies || []), replyWithAuthor] }
             : c,
         ),
       )
