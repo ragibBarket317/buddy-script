@@ -1,4 +1,4 @@
-# BuddyScript — Full Stack Developer Assessment (Appifylab)
+# BuddyScript — Full Stack Developer
 
 A social feed application built as part of the Full Stack Developer selection task for Appifylab. Users can register, log in, create posts (text + image, public/private), like/unlike posts, comment, reply, and see who has liked a post, comment, or reply.
 
